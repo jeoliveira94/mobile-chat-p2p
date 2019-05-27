@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MobileChatP2P.Mensagem">
+  <ContentView.Content>
+        <Frame x:Name="frame" HorizontalOptions="FillAndExpand" 
+               Margin="35, 2, 2, 2" 
+               BackgroundColor="#c4daff" 
+               CornerRadius="10"
+               >
+            
+        </Frame>
+    </ContentView.Content>
+</ContentView>

@@ -20,43 +20,28 @@
         <StackLayout VerticalOptions="FillAndExpand">
             <ScrollView VerticalOptions="EndAndExpand">
                 <ScrollView.Content>
-                    <StackLayout>
-                        <Frame HorizontalOptions="FillAndExpand" Margin="35, 5, 5 ,5" BackgroundColor="#c4daff"
-                               CornerRadius="15">
-                            <Frame.Content>
-                                <Label Text="mensagem"/>
-                            </Frame.Content>
-                        </Frame>
-                        <Frame HorizontalOptions="FillAndExpand" Margin="5, 5, 35 ,5" BackgroundColor="#c4daff"
-                               CornerRadius="15">
-                            <Frame.Content>
-                                <Label Text="mensagem"/>
-                            </Frame.Content>
-                        </Frame>
-                        <Frame HorizontalOptions="FillAndExpand" Margin="35, 5, 5 ,5" BackgroundColor="#c4daff"
-                               CornerRadius="15">
-                            <Frame.Content>
-                                <Label Text="mensagem"/>
-                            </Frame.Content>
-                        </Frame>
-                        <Frame HorizontalOptions="FillAndExpand" Margin="5, 5, 35 ,5" BackgroundColor="#c4daff"
-                               CornerRadius="15">
-                            <Frame.Content>
-                                <Label Text="mensagem"/>
-                            </Frame.Content>
-                        </Frame>
-                        <Frame HorizontalOptions="FillAndExpand" Margin="35, 5, 5 ,5" BackgroundColor="#c4daff"
-                               CornerRadius="15">
-                            <Frame.Content>
-                                <Label Text="mensagem"/>
-                            </Frame.Content>
-                        </Frame>
-                    </StackLayout>
+                    <StackLayout x:Name="stack"/>
                 </ScrollView.Content>
             </ScrollView>
-            <StackLayout Orientation="Horizontal" VerticalOptions="End" HorizontalOptions="FillAndExpand" Margin="5">
-                <Editor Placeholder="mensangem" AutoSize="TextChanges" HorizontalOptions="FillAndExpand"/>
-                <Button Text="enviar" HorizontalOptions="End" CornerRadius="100"/>
+            <StackLayout Orientation="Horizontal" VerticalOptions="End" HorizontalOptions="FillAndExpand" Margin="5"
+                         HeightRequest="100">
+                <ScrollView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+                    <ScrollView.Content>
+                        <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="EndAndExpand">
+                            <Editor x:Name="editor" 
+                                    Placeholder="mensangem" 
+                                    AutoSize="Disabled" 
+                                    HorizontalOptions="FillAndExpand"
+                                    VerticalOptions="FillAndExpand"
+                                    MaxLength="256"/>
+                        </StackLayout>
+                    </ScrollView.Content>
+                </ScrollView>
+                <StackLayout HorizontalOptions="End" VerticalOptions="CenterAndExpand">
+                    <Button x:Name="button" Text="enviar" HorizontalOptions="End" CornerRadius="100" BackgroundColor="#c4daff"
+                        Command="enviarMensagem"/>
+                </StackLayout>
+                
             </StackLayout>
         </StackLayout>
     </ContentPage.Content>
