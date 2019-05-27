@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MobileChatP2P.Chat"
+             
+             Title="{Binding meuIp}">
+
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style TargetType="View">
+                <Setter Property="BackgroundColor" Value="#FFF"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Anexar"/>
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <StackLayout VerticalOptions="FillAndExpand">
+            <ScrollView VerticalOptions="EndAndExpand">
+                <ScrollView.Content>
+                    <StackLayout>
+                        <Frame HorizontalOptions="FillAndExpand" Margin="35, 5, 5 ,5" BackgroundColor="#c4daff"
+                               CornerRadius="15">
+                            <Frame.Content>
+                                <Label Text="mensagem"/>
+                            </Frame.Content>
+                        </Frame>
+                        <Frame HorizontalOptions="FillAndExpand" Margin="5, 5, 35 ,5" BackgroundColor="#c4daff"
+                               CornerRadius="15">
+                            <Frame.Content>
+                                <Label Text="mensagem"/>
+                            </Frame.Content>
+                        </Frame>
+                        <Frame HorizontalOptions="FillAndExpand" Margin="35, 5, 5 ,5" BackgroundColor="#c4daff"
+                               CornerRadius="15">
+                            <Frame.Content>
+                                <Label Text="mensagem"/>
+                            </Frame.Content>
+                        </Frame>
+                        <Frame HorizontalOptions="FillAndExpand" Margin="5, 5, 35 ,5" BackgroundColor="#c4daff"
+                               CornerRadius="15">
+                            <Frame.Content>
+                                <Label Text="mensagem"/>
+                            </Frame.Content>
+                        </Frame>
+                        <Frame HorizontalOptions="FillAndExpand" Margin="35, 5, 5 ,5" BackgroundColor="#c4daff"
+                               CornerRadius="15">
+                            <Frame.Content>
+                                <Label Text="mensagem"/>
+                            </Frame.Content>
+                        </Frame>
+                    </StackLayout>
+                </ScrollView.Content>
+            </ScrollView>
+            <StackLayout Orientation="Horizontal" VerticalOptions="End" HorizontalOptions="FillAndExpand" Margin="5">
+                <Editor Placeholder="mensangem" AutoSize="TextChanges" HorizontalOptions="FillAndExpand"/>
+                <Button Text="enviar" HorizontalOptions="End" CornerRadius="100"/>
+            </StackLayout>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
