@@ -12,16 +12,21 @@ namespace MobileChatP2P
     class SocketServer
     {
 
-        public Task<string> StartServer()
+        IPHostEntry host;
+        IPAddress ipAddress;
+        IPEndPoint localEndPoint;
+        public delegate void MensagemRecebida(string result);
+
+        public SocketServer()
         {
-            // Get Host IP Address that is used to establish a connection  
-            // In this case, we get one IP address of localhost that is IP : 127.0.0.1  
-            // If a host has multiple addresses, you will get a list of addresses  
-            IPHostEntry host = Dns.GetHostEntry("localhost");
-            IPAddress ipAddress = host.AddressList[0];
-            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
+            host = Dns.GetHostEntry("localhost");
+            ipAddress = host.AddressList[0];
+            localEndPoint = new IPEndPoint(ipAddress, 11000);
+        }
 
-
+        public Task<string> Listen(MensagemRecebida callback)
+        {
+            
             try
             {
 
@@ -32,8 +37,7 @@ namespace MobileChatP2P
                 // Specify how many requests a Socket can listen before it gives Server busy response.  
                 // We will listen 10 requests at a time  
                 listener.Listen(10);
-
-                Console.WriteLine("Waiting for a connection...");
+                
                 Socket handler = listener.Accept();
 
                 // Incoming data from the client.    
@@ -47,14 +51,17 @@ namespace MobileChatP2P
                     data += Encoding.ASCII.GetString(bytes, 0, bytesRec);
                     if (data.IndexOf("<EOF>") > -1)
                     {
-                        break;
+                        //callback(data);
+                        Console.WriteLine(data);
+                        data = "";
+                     //   break;
                     }
                 }
 
                 Console.WriteLine("Text received : {0}", data);
 
-                byte[] msg = Encoding.ASCII.GetBytes(data);
-                handler.Send(msg);
+                //byte[] msg = Encoding.ASCII.GetBytes(data);
+                //handler.Send(msg);
                 handler.Shutdown(SocketShutdown.Both);
                 handler.Close();
                 return Task.FromResult(data);

@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-<<<<<<< HEAD
 using System.Windows.Input;
-=======
 using System.Net;
->>>>>>> back-end
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using System.Threading;
 
 namespace MobileChatP2P
 {
@@ -31,11 +29,21 @@ namespace MobileChatP2P
             enviarMensagem = new Command(_enviarMensagem);
             button.Command = enviarMensagem;
 
+            server = new SocketServer();
+            Thread listenThread = new Thread(RunServer);
+            listenThread.Start();
+            //RunServer();
+
         }
 
         public void AddMensagem(View conteudo, Mensagem.Remetente remetente)
         {
             stack.Children.Add(new Mensagem(conteudo, remetente));
+        }
+
+        public void MensagemRecebida(string msg)
+        {
+            AddMensagem(new Label() { Text = msg }, Mensagem.Remetente.Servidor);
         }
 
         private void StartConnection(string ipText)
@@ -45,8 +53,9 @@ namespace MobileChatP2P
 
         public async void RunServer()
         {
-            server = new SocketServer();
-            meuIp = await server.StartServer();
+            
+            var msg = await server.Listen(MensagemRecebida);
+            AddMensagem(new Label() { Text = msg }, Mensagem.Remetente.Cliente);
         }
 
         private void _enviarMensagem()
