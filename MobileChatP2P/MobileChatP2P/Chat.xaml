@@ -18,7 +18,7 @@
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <StackLayout VerticalOptions="FillAndExpand">
-            <ScrollView VerticalOptions="EndAndExpand">
+            <ScrollView VerticalOptions="EndAndExpand" x:Name="scrollView">
                 <ScrollView.Content>
                     <StackLayout x:Name="stack"/>
                 </ScrollView.Content>
@@ -29,7 +29,7 @@
                     <ScrollView.Content>
                         <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="EndAndExpand">
                             <Editor x:Name="editor" 
-                                    Placeholder="mensangem" 
+                                    Placeholder="mensagem" 
                                     AutoSize="Disabled" 
                                     HorizontalOptions="FillAndExpand"
                                     VerticalOptions="FillAndExpand"

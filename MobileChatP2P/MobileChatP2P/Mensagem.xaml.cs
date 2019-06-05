@@ -24,6 +24,7 @@ namespace MobileChatP2P
             if(remetente == Remetente.Cliente)
             {
                 frame.Margin = new Thickness(2, 2, 35, 2);
+                frame.BackgroundColor = Color.PaleGreen;
             }
         }
 

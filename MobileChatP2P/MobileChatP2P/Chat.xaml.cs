@@ -45,7 +45,9 @@ namespace MobileChatP2P
 
         public void AddMensagem(View conteudo, Mensagem.Remetente remetente)
         {
-            stack.Children.Add(new Mensagem(conteudo, remetente));
+            var mensagem = new Mensagem(conteudo, remetente);
+            stack.Children.Add(mensagem);
+            scrollView.ScrollToAsync(mensagem, ScrollToPosition.End, false);
         }
 
         public void MensagemRecebida(string msg)
@@ -67,7 +69,9 @@ namespace MobileChatP2P
 
         private void _enviarMensagem()
         {
+            if (editor.Text == String.Empty) return;
             string msg = editor.Text;
+            editor.Text = "";
             Console.WriteLine(msg);
 
             
