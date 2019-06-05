@@ -15,7 +15,7 @@ namespace MobileChatP2P
     public partial class Chat : ContentPage
     {
         public ICommand enviarMensagem { get; }
-        public string meuIp { get; set; } = "192.168.0.0.1";
+        public string meuIp { get; set; } = "teste";
         private SocketClient client;
         private SocketServer server;
 
@@ -30,8 +30,15 @@ namespace MobileChatP2P
             button.Command = enviarMensagem;
 
             server = new SocketServer();
-            Thread listenThread = new Thread(RunServer);
-            listenThread.Start();
+            Task.Run(() => {                
+                    RunServer();                
+            });
+
+
+            client = new SocketClient();
+            meuIp = client.myIpAddress.ToString();
+
+            
             //RunServer();
 
         }
@@ -43,7 +50,9 @@ namespace MobileChatP2P
 
         public void MensagemRecebida(string msg)
         {
-            AddMensagem(new Label() { Text = msg }, Mensagem.Remetente.Servidor);
+            Device.BeginInvokeOnMainThread(() => {
+                AddMensagem(new Label() { Text = msg }, Mensagem.Remetente.Cliente);
+            });
         }
 
         private void StartConnection(string ipText)
@@ -52,17 +61,30 @@ namespace MobileChatP2P
         }
 
         public async void RunServer()
-        {
-            
-            var msg = await server.Listen(MensagemRecebida);
-            AddMensagem(new Label() { Text = msg }, Mensagem.Remetente.Cliente);
+        {            
+            server.Listen(MensagemRecebida);
         }
 
         private void _enviarMensagem()
         {
             string msg = editor.Text;
             Console.WriteLine(msg);
-            AddMensagem(new Label() { Text = msg }, Mensagem.Remetente.Servidor);
+
+            
+           
+            if(client._Client.Connected){
+                AddMensagem(new Label() { Text = msg }, Mensagem.Remetente.Servidor);
+                client.SendMessage(msg);
+            }
+            else
+            {
+                AddMensagem(new Label() { Text = msg }, Mensagem.Remetente.Servidor);
+                StartConnection(msg);
+                if (client._Client.Connected)
+                {
+                    AddMensagem(new Label() { Text = "Conectado com sucesso" }, Mensagem.Remetente.Cliente);
+                }
+            }
         }
 
 

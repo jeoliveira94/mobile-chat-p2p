@@ -24,57 +24,47 @@ namespace MobileChatP2P
             localEndPoint = new IPEndPoint(ipAddress, 11000);
         }
 
-        public Task<string> Listen(MensagemRecebida callback)
+        public void Listen(MensagemRecebida callback)
         {
             
             try
             {
 
                 // Create a Socket that will use Tcp protocol      
-                Socket listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                TcpListener listener = new TcpListener(localEndPoint);
                 // A Socket must be associated with an endpoint using the Bind method  
-                listener.Bind(localEndPoint);
-                // Specify how many requests a Socket can listen before it gives Server busy response.  
-                // We will listen 10 requests at a time  
-                listener.Listen(10);
+                listener.Start();
                 
-                Socket handler = listener.Accept();
+                Socket handler = listener.AcceptSocket();
 
                 // Incoming data from the client.    
-                string data = null;
-                byte[] bytes = null;
-
-                while (true)
+                string data = String.Empty;
+                while (handler.Connected)
                 {
-                    bytes = new byte[1024];
-                    int bytesRec = handler.Receive(bytes);
-                    data += Encoding.ASCII.GetString(bytes, 0, bytesRec);
-                    if (data.IndexOf("<EOF>") > -1)
+
+                    byte[] buffer = new byte[1024];
+                    int dataReceived = handler.Receive(buffer);
+
+                    if(dataReceived == 0)
                     {
-                        //callback(data);
-                        Console.WriteLine(data);
-                        data = "";
-                     //   break;
+                        break;
                     }
+
+                    Console.WriteLine("Text received : {0}", data);
+
+                    data = Encoding.ASCII.GetString(buffer);
+                    callback(data);
+                    
                 }
-
-                Console.WriteLine("Text received : {0}", data);
-
-                //byte[] msg = Encoding.ASCII.GetBytes(data);
-                //handler.Send(msg);
-                handler.Shutdown(SocketShutdown.Both);
                 handler.Close();
-                return Task.FromResult(data);
+                listener.Stop();
+                
                 
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
             }
-
-            return Task.FromResult(String.Empty);
-
-
         }
     }
 }

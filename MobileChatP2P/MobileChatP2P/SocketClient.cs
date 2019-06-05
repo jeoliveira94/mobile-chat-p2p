@@ -5,12 +5,14 @@ using System.Text;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.IO;
 
 namespace MobileChatP2P
 {
     public class SocketClient
     {
-        Socket sender;
+        public TcpClient _Client;
+        Stream _Stream;
         public IPAddress myIpAddress;
 
         public SocketClient()
@@ -18,50 +20,48 @@ namespace MobileChatP2P
             IPHostEntry host = Dns.GetHostEntry("localhost");
             this.myIpAddress = host.AddressList[0];
 
-            sender = new Socket(myIpAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            _Client = new TcpClient();
+
+            
         }
 
         public void SendMessage(string message) {
-            byte[] bytes = new byte[1024];
+            if (_Client.Connected)
+            {
+                // Create Instance of an Encoder:
+                ASCIIEncoding _Asc = new ASCIIEncoding();
 
-            //byte[] msg = Encoding.ASCII.GetBytes("This is a test<EOF>");
+                byte[] _Buffer = new byte[1024];
 
-            byte[] msg = Encoding.ASCII.GetBytes(message);
+                // Create Buffer to Send Message:
+                _Buffer = _Asc.GetBytes(message);                
 
-            // Send the data through the socket.    
-            int bytesSent = sender.Send(msg);
-
-            // Receive the response from the remote device.    
-            int bytesRec = sender.Receive(bytes);
-            Console.WriteLine("Echoed test = {0}", Encoding.ASCII.GetString(bytes, 0, bytesRec));
+                // Write Message to the Stream:
+                _Stream.Write(_Buffer, 0, _Buffer.Length);
+            }
         }
 
         public void StartClient(IPAddress serverIP)
         {
-                                
-            IPEndPoint remoteEP = new IPEndPoint(serverIP, 11000);              
-                
-
-            // Connect the socket to the remote endpoint. Catch any errors.    
             try
             {
-                // Connect to Remote EndPoint  
-                sender.Connect(remoteEP);
-
-                Console.WriteLine("Socket connected to {0}", sender.RemoteEndPoint.ToString());
-
-
+                _Client.Connect(serverIP, 11000);
+                // Create a Stream:                
+                _Stream = _Client.GetStream();
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception: {0}", e.ToString());
+
             }
+
+           
         }
 
         public void StopClient()
         {
-            sender.Shutdown(SocketShutdown.Both);
-            sender.Close();
+            _Stream.Close();
+            _Stream.Dispose();
+            _Client.Close();
         }
     }
 }
