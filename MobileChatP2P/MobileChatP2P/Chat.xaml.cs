@@ -43,9 +43,9 @@ namespace MobileChatP2P
 
         }
 
-        public void AddMensagem(View conteudo, Mensagem.Remetente remetente)
+        public void AddMensagem(View conteudo, Mensagem.Remetente remetente, int status = 1)
         {
-            var mensagem = new Mensagem(conteudo, remetente);
+            var mensagem = new Mensagem(conteudo, remetente, status);
             stack.Children.Add(mensagem);
             scrollView.ScrollToAsync(mensagem, ScrollToPosition.End, false);
         }
@@ -59,12 +59,24 @@ namespace MobileChatP2P
 
         private void StartConnection(string ipText)
         {
-            client.StartClient(IPAddress.Parse(ipText));
+            try
+            {
+                client.StartClient(IPAddress.Parse(ipText));
+            }catch(Exception e)
+            {
+                Device.BeginInvokeOnMainThread(() => {
+                    AddMensagem(new Label() { Text = "IP invalido, seu burro." }, Mensagem.Remetente.Cliente, 0);
+                });
+            }
         }
 
         public async void RunServer()
         {            
-            server.Listen(MensagemRecebida);
+            server.Listen(MensagemRecebida);            
+            client.StopClient();
+            Device.BeginInvokeOnMainThread(() => {
+                AddMensagem(new Label() { Text = "Desconectado" }, Mensagem.Remetente.Cliente, 0);
+            });
         }
 
         private void _enviarMensagem()

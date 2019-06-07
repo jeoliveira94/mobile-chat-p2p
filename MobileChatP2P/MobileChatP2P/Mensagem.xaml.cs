@@ -17,14 +17,21 @@ namespace MobileChatP2P
             Cliente,
             Servidor
         }
-        public Mensagem(View conteudo, Remetente remetente)
+        public Mensagem(View conteudo, Remetente remetente, int status)
         {
             InitializeComponent();
             frame.Content = conteudo;
             if(remetente == Remetente.Cliente)
             {
                 frame.Margin = new Thickness(2, 2, 35, 2);
-                frame.BackgroundColor = Color.PaleGreen;
+                if (status == 0)
+                {
+                    frame.BackgroundColor = Color.PaleVioletRed;
+                }
+                else
+                {
+                    frame.BackgroundColor = Color.PaleGreen;
+                }
             }
         }
 
