@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Net;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using System.Threading;
+using Android.Graphics;
+using System.IO;
+using Java.IO;
 
 namespace MobileChatP2P
 {
@@ -15,6 +14,7 @@ namespace MobileChatP2P
     public partial class Chat : ContentPage
     {
         public ICommand enviarMensagem { get; }
+        public ICommand anexar_item { get; }
         public string meuIp { get; set; } = "teste";
         private SocketClient client;
         private SocketServer server;
@@ -27,6 +27,7 @@ namespace MobileChatP2P
 
 
             enviarMensagem = new Command(_enviarMensagem);
+            anexar_item = new Command(_enviarImagem);
             button.Command = enviarMensagem;
 
             server = new SocketServer();
@@ -84,8 +85,6 @@ namespace MobileChatP2P
             if (editor.Text == String.Empty) return;
             string msg = editor.Text;
             editor.Text = "";
-            Console.WriteLine(msg);
-
             
            
             if(client._Client.Connected){
@@ -100,9 +99,18 @@ namespace MobileChatP2P
                 {
                     AddMensagem(new Label() { Text = "Conectado com sucesso" }, Mensagem.Remetente.Cliente);
                 }
+                //_enviarImagem();
             }
         }
 
+        private void _enviarImagem()
+        {
+            string imgPath = System.IO.Path.Combine(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, "display.png");
+            System.IO.File.SetAttributes(imgPath, FileAttributes.Normal);
+            byte[] buffer = System.IO.File.ReadAllBytes(imgPath);
+            client.SendImage(buffer);
+
+        }
 
     }
 }

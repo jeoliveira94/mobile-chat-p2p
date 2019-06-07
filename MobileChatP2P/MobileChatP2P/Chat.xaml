@@ -14,7 +14,7 @@
         </ResourceDictionary>
     </ContentPage.Resources>
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Anexar"/>
+        <ToolbarItem Text="Anexar" Command="anexar_item"/>
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <StackLayout VerticalOptions="FillAndExpand">

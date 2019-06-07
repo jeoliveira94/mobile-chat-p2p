@@ -6,6 +6,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.IO;
+using System.Drawing;
+using Android.Graphics;
 
 namespace MobileChatP2P
 {
@@ -28,6 +30,7 @@ namespace MobileChatP2P
         public void SendMessage(string message) {
             if (_Client.Connected)
             {
+                SendCode(TipoMensagem.TEXTO);
                 // Create Instance of an Encoder:
                 ASCIIEncoding _Asc = new ASCIIEncoding();
 
@@ -39,6 +42,23 @@ namespace MobileChatP2P
                 // Write Message to the Stream:
                 _Stream.Write(_Buffer, 0, _Buffer.Length);
             }
+        }
+        public void SendImage(byte[] buffer)
+        {
+            if (_Client.Connected)
+            {
+                SendCode(TipoMensagem.IMAGEM);
+                //byte[] _Buffer = new byte[1024];
+                //_Buffer = image.ToArray<byte>();
+                _Stream.Write(buffer, 0, buffer.Length);
+            }
+        }
+        private void SendCode(TipoMensagem tipo)
+        {
+            ASCIIEncoding _Asc = new ASCIIEncoding();
+            byte[] _Buffer = new byte[1024];
+            _Buffer = _Asc.GetBytes(tipo.ToString());
+            _Stream.Write(_Buffer, 0, _Buffer.Length);
         }
 
         public void StartClient(IPAddress serverIP)

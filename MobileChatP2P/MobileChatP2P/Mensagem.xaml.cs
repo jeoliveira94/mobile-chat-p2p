@@ -9,6 +9,13 @@ using Xamarin.Forms.Xaml;
 
 namespace MobileChatP2P
 {
+    public enum TipoMensagem
+    {
+        TEXTO,
+        IMAGEM,
+        VIDEO,
+        CODE
+    }
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class Mensagem : ContentView
     {
