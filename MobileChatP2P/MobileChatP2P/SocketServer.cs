@@ -47,8 +47,9 @@ namespace MobileChatP2P
                 while (handler.Connected)
                 {
 
-                    byte[] buffer = new byte[1024];
+                    byte[] buffer = new byte[1000000];
                     int dataReceived = handler.Receive(buffer);
+                    
 
                     if(dataReceived == 0)
                     {
@@ -59,9 +60,18 @@ namespace MobileChatP2P
                     if(tipo_atual == TipoMensagem.CODE)
                     {
                         data = Encoding.ASCII.GetString(buffer);
-                        Enum.TryParse(data, out TipoMensagem tipo);
+                        if (data.Contains("IMAGEM"))
+                        {
+                            tipo_atual = TipoMensagem.IMAGEM;
+                        }else if (data.Contains("TEXTO"))
+                        {
+                            tipo_atual = TipoMensagem.TEXTO;
+                        }
+                        else if (data.Contains("VIDEO"))
+                        {
+                            tipo_atual = TipoMensagem.VIDEO;
+                        }
                         callback(data);
-                        tipo_atual = tipo;
                     }else if(tipo_atual == TipoMensagem.TEXTO)
                     {
                         data = Encoding.ASCII.GetString(buffer);
@@ -72,10 +82,11 @@ namespace MobileChatP2P
                     {
                         data = "Recebendo uma Imagem";
                         callback(data);
-                        Bitmap img = (Bitmap)Bitmap.FromArray(buffer);
+                        //Bitmap img = (Bitmap)Bitmap.FromArray(buffer);
                         string fileName = System.IO.Path.Combine(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, "kelson.png");
 
-                        img.Compress(Bitmap.CompressFormat.Png, 100, new FileStream(fileName, FileMode.Create));
+                        //img.Compress(Bitmap.CompressFormat.Png, 100, new FileStream(fileName, FileMode.Create));
+                        System.IO.File.WriteAllBytes(fileName, buffer);
 
                         tipo_atual = TipoMensagem.CODE;
                     }

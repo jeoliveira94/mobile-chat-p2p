@@ -99,17 +99,35 @@ namespace MobileChatP2P
                 {
                     AddMensagem(new Label() { Text = "Conectado com sucesso" }, Mensagem.Remetente.Cliente);
                 }
-                //_enviarImagem();
+                _enviarImagem();
             }
         }
 
         private void _enviarImagem()
         {
             string imgPath = System.IO.Path.Combine(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, "display.png");
-            System.IO.File.SetAttributes(imgPath, FileAttributes.Normal);
-            byte[] buffer = System.IO.File.ReadAllBytes(imgPath);
-            client.SendImage(buffer);
 
+            using (StreamReader sr = new StreamReader(imgPath))
+            {
+                BinaryReader binreader = new BinaryReader(sr.BaseStream);
+                var allData = ReadAllBytes(binreader);
+                //Bitmap bitmap = BitmapFactory.DecodeByteArray(allData, 0, allData.Length);
+                client.SendImage(allData);
+            }           
+
+        }
+
+        public static byte[] ReadAllBytes(BinaryReader reader)
+        {
+            const int bufferSize = 4096;
+            using (var ms = new MemoryStream())
+            {
+                byte[] buffer = new byte[bufferSize];
+                int count;
+                while ((count = reader.Read(buffer, 0, buffer.Length)) != 0)
+                    ms.Write(buffer, 0, count);
+                return ms.ToArray();
+            }
         }
 
     }

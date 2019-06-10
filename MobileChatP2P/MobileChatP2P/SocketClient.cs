@@ -48,6 +48,8 @@ namespace MobileChatP2P
             if (_Client.Connected)
             {
                 SendCode(TipoMensagem.IMAGEM);
+
+                Thread.Sleep(500);
                 //byte[] _Buffer = new byte[1024];
                 //_Buffer = image.ToArray<byte>();
                 _Stream.Write(buffer, 0, buffer.Length);
