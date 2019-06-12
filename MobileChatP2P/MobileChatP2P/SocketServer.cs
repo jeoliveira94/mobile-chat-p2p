@@ -21,6 +21,11 @@ namespace MobileChatP2P
         IPEndPoint localEndPoint;
         public delegate void MensagemRecebida(string result);
 
+        TipoMensagem tipo_atual = TipoMensagem.TEXTO;
+        int size_esperado = 0;
+        int size_recebido = 0;
+        byte[] buffer_total = new byte[100000000];
+
         public SocketServer()
         {
             host = Dns.GetHostEntry("localhost");
@@ -43,7 +48,7 @@ namespace MobileChatP2P
 
                 // Incoming data from the client.    
                 string data = String.Empty;
-                TipoMensagem tipo_atual = TipoMensagem.CODE;
+                
                 while (handler.Connected)
                 {
 
@@ -55,50 +60,72 @@ namespace MobileChatP2P
                     {
                         break;
                     }
+
                     
 
-                    if(tipo_atual == TipoMensagem.CODE)
+                    if (size_recebido == 0)
                     {
-                        data = Encoding.ASCII.GetString(buffer);
-                        if (data.Contains("IMAGEM"))
+                        tipo_atual = (TipoMensagem)buffer[0];
+                        for (int i = 1; i < 10; i++)
                         {
-                            tipo_atual = TipoMensagem.IMAGEM;
-                        }else if (data.Contains("TEXTO"))
-                        {
-                            tipo_atual = TipoMensagem.TEXTO;
+                            int pot = 9 - i;
+                            int factor = (int)Math.Pow(10, pot);
+                            size_esperado += buffer[i] * factor;
                         }
-                        else if (data.Contains("VIDEO"))
+                        size_recebido += dataReceived;
+
+                        for(int i = 10; i < dataReceived; i++)
                         {
-                            tipo_atual = TipoMensagem.VIDEO;
+                            buffer_total[i - 10] = buffer[i];
                         }
-                        callback(data);
-                    }else if(tipo_atual == TipoMensagem.TEXTO)
-                    {
-                        data = Encoding.ASCII.GetString(buffer);
-                        callback(data);
-                        tipo_atual = TipoMensagem.CODE;
+                        callback("Recebendo " + size_esperado+" bytes");
+                        callback("Recebendo " + tipo_atual.ToString());
                     }
-                    else if (tipo_atual == TipoMensagem.IMAGEM)
+                    else if(size_recebido < size_esperado)
                     {
-                        data = "Recebendo uma Imagem";
-                        callback(data);
-                        //Bitmap img = (Bitmap)Bitmap.FromArray(buffer);
-                        string fileName = System.IO.Path.Combine(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, "kelson.png");
+                        for(int i = 0; i < dataReceived; i++)
+                        {
+                            buffer_total[size_recebido + i] = buffer[i];
+                        }
+                        size_recebido += dataReceived;                        
+                    }
 
-                        //img.Compress(Bitmap.CompressFormat.Png, 100, new FileStream(fileName, FileMode.Create));
-                        System.IO.File.WriteAllBytes(fileName, buffer);
-
-                        tipo_atual = TipoMensagem.CODE;
-                    }
-                    else if (tipo_atual == TipoMensagem.VIDEO)
+                    if (size_recebido >= size_esperado)
                     {
-                        data = "Recebendo um Video";
-                        callback(data);
-                        tipo_atual = TipoMensagem.CODE;
+                        byte[] dados_bytes = new byte[size_recebido];
+
+                        for (int i = 0; i < dados_bytes.Length; i++)
+                        {
+                            dados_bytes[i] = buffer_total[i];
+                        }
+                        if (tipo_atual == TipoMensagem.TEXTO)
+                        {
+                            data = Encoding.ASCII.GetString(dados_bytes);
+                            callback(data);
+                        }
+                        else if (tipo_atual == TipoMensagem.IMAGEM)
+                        {
+
+                            string fileName = System.IO.Path.Combine(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, "kelson.png");
+
+                            System.IO.File.WriteAllBytes(fileName, dados_bytes);
+
+                            //tipo_atual = TipoMensagem.CODE;
+                        }
+                        else if (tipo_atual == TipoMensagem.VIDEO)
+                        {
+                            data = "Recebendo um Video";
+                            callback(data);
+                            //tipo_atual = TipoMensagem.CODE;
+                        }
+
+                        buffer_total = new byte[100000000];
+                        size_esperado = 0;
+                        size_recebido = 0;
                     }
-                    
-                    
-                    
+
+
+
                 }
                 handler.Close();
                 listener.Stop();

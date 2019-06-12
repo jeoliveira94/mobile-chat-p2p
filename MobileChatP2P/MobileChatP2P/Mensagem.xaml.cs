@@ -11,10 +11,9 @@ namespace MobileChatP2P
 {
     public enum TipoMensagem
     {
-        TEXTO,
-        IMAGEM,
-        VIDEO,
-        CODE
+        TEXTO = 0,
+        IMAGEM = 1,
+        VIDEO = 2,
     }
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class Mensagem : ContentView
