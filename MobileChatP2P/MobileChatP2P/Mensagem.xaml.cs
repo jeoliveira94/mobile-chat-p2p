@@ -62,7 +62,7 @@ namespace MobileChatP2P
                     break;
                 case TipoMensagem.VIDEO:
                     conteudo = new Label() { Text = "Video Recebido: "+menssagem };
-
+                    
                     /*var img = new Xamarin.Forms.Image();
                     string path = Android.OS.Environment.ExternalStorageDirectory.AbsolutePath + "/" + "manifesta.mp4";
 

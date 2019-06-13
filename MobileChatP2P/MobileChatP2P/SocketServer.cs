@@ -4,6 +4,7 @@ using System.Text;
 using System.Net;
 using System.Net.Sockets;
 using Plugin.Media;
+using Xamarin.Forms;
 
 namespace MobileChatP2P
 {
@@ -133,7 +134,10 @@ namespace MobileChatP2P
                             //callback(data, TipoMensagem.TEXTO);
                             callback(fileName, TipoMensagem.VIDEO);
                             //tipo_atual = TipoMensagem.CODE;
-
+                            Device.BeginInvokeOnMainThread(() =>
+                            {
+                                Device.OpenUri(new Uri(fileName));
+                            });
                         }
 
                         buffer_total = new byte[100000000];
