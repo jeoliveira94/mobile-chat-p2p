@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
-using Android.Graphics;
-using System.IO;
-using Java.Nio;
-using Java.IO;
+
 
 namespace MobileChatP2P
 {
@@ -19,7 +13,7 @@ namespace MobileChatP2P
         IPHostEntry host;
         IPAddress ipAddress;
         IPEndPoint localEndPoint;
-        public delegate void MensagemRecebida(string result);
+        public delegate void MensagemRecebida(string result, TipoMensagem tipo);
 
         TipoMensagem tipo_atual = TipoMensagem.TEXTO;
         int size_esperado = 0;
@@ -78,8 +72,8 @@ namespace MobileChatP2P
                         {
                             buffer_total[i - 10] = buffer[i];
                         }
-                        callback("Recebendo " + size_esperado+" bytes");
-                        callback("Recebendo " + tipo_atual.ToString());
+                        //callback("Recebendo " + size_esperado+" bytes", TipoMensagem.TEXTO);
+                        //callback("Recebendo " + tipo_atual.ToString(), TipoMensagem.TEXTO);
                     }
                     else if(size_recebido < size_esperado)
                     {
@@ -101,7 +95,7 @@ namespace MobileChatP2P
                         if (tipo_atual == TipoMensagem.TEXTO)
                         {
                             data = Encoding.ASCII.GetString(dados_bytes);
-                            callback(data);
+                            callback(data, TipoMensagem.TEXTO);
                         }
                         else if (tipo_atual == TipoMensagem.IMAGEM)
                         {
@@ -112,13 +106,21 @@ namespace MobileChatP2P
                             }
                             
                             string fileName = System.IO.Path.Combine(dirPath, "img_"+DateTime.Now.ToString("yyyyMMdd_hhmmss")+ ".png");
+                   
+
+                            for (int i = 0; i < 5; i++)
+                            {
+                                Console.WriteLine(fileName);
+                            }
+
 
                             System.IO.File.WriteAllBytes(fileName, dados_bytes);
-
+                            callback(fileName, TipoMensagem.IMAGEM);
                             //tipo_atual = TipoMensagem.CODE;
                         }
                         else if (tipo_atual == TipoMensagem.VIDEO)
                         {
+
                             string dirPath = Android.OS.Environment.ExternalStorageDirectory.AbsolutePath + "/" + "MobileChatData";
                             if (!System.IO.Directory.Exists(dirPath))
                             {
@@ -128,6 +130,13 @@ namespace MobileChatP2P
                             string fileName = System.IO.Path.Combine(dirPath, "vid_" + DateTime.Now.ToString("yyyyMMdd_hhmmss") + ".mp4");
 
                             System.IO.File.WriteAllBytes(fileName, dados_bytes);
+
+        
+                            data = "Recebendo um Video";
+                            //callback(data, TipoMensagem.TEXTO);
+                            callback(fileName, TipoMensagem.VIDEO);
+                            //tipo_atual = TipoMensagem.CODE;
+
                         }
 
                         buffer_total = new byte[100000000];

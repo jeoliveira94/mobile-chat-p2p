@@ -4,9 +4,9 @@ using System.Windows.Input;
 using System.Net;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using Android.Graphics;
 using System.IO;
-using Java.IO;
+using Xamarin.Forms.PlatformConfiguration;
+using Plugin.Media;
 
 namespace MobileChatP2P
 {
@@ -27,8 +27,29 @@ namespace MobileChatP2P
 
 
             enviarMensagem = new Command(_enviarMensagem);
-            anexar_item = new Command(_enviarImagem);
+            anexar_item = new Command(async () => {
+                if (!CrossMedia.Current.IsPickPhotoSupported)
+                {
+                    DisplayAlert("Photos Not Supported", ":( Permission not granted to photos.", "OK");
+                    return;
+                }
+                var file = await Plugin.Media.CrossMedia.Current.PickPhotoAsync(new Plugin.Media.Abstractions.PickMediaOptions
+                {
+                    PhotoSize = Plugin.Media.Abstractions.PhotoSize.Medium,
+
+                });
+
+                if (file == null)
+                    return;
+                _enviarImagem(file.Path);
+                for (int i = 0; i < 5; i++)
+                {
+                    Console.WriteLine(file.Path);
+                }
+                
+            });
             button.Command = enviarMensagem;
+            btn_Anexar.Command = anexar_item;
 
             server = new SocketServer();
             Task.Run(() => {                
@@ -38,23 +59,21 @@ namespace MobileChatP2P
 
             client = new SocketClient();
             meuIp = client.myIpAddress.ToString();
-
-            
             //RunServer();
 
         }
 
-        public void AddMensagem(View conteudo, Mensagem.Remetente remetente, int status = 1)
+        public void ShowMensagem(string mensagem, TipoMensagem tipo, Remetente remetente, int status = 1)
         {
-            var mensagem = new Mensagem(conteudo, remetente, status);
-            stack.Children.Add(mensagem);
-            scrollView.ScrollToAsync(mensagem, ScrollToPosition.End, false);
+            var msg = Mensagem.CriarMensagem(mensagem, tipo, remetente, status);
+            stack.Children.Add(msg);
+            scrollView.ScrollToAsync(msg, ScrollToPosition.End, false);
         }
 
-        public void MensagemRecebida(string msg)
+        public void MensagemRecebida(string msg, TipoMensagem tipo)
         {
             Device.BeginInvokeOnMainThread(() => {
-                AddMensagem(new Label() { Text = msg }, Mensagem.Remetente.Cliente);
+                ShowMensagem(msg, tipo, Remetente.CLIENTE);
             });
         }
 
@@ -66,7 +85,7 @@ namespace MobileChatP2P
             }catch(Exception e)
             {
                 Device.BeginInvokeOnMainThread(() => {
-                    AddMensagem(new Label() { Text = "IP invalido, seu burro." }, Mensagem.Remetente.Cliente, 0);
+                    ShowMensagem("IP invalido, seu burro.", TipoMensagem.TEXTO, Remetente.CLIENTE, 0);
                 });
             }
         }
@@ -76,37 +95,42 @@ namespace MobileChatP2P
             server.Listen(MensagemRecebida);            
             client.StopClient();
             Device.BeginInvokeOnMainThread(() => {
-                AddMensagem(new Label() { Text = "Desconectado" }, Mensagem.Remetente.Cliente, 0);
+                ShowMensagem("Desconectado", TipoMensagem.TEXTO, Remetente.CLIENTE, 0);
             });
         }
 
         private void _enviarMensagem()
         {
-            if (editor.Text == String.Empty) return;
+            if (editor.Text == string.Empty) return;
             string msg = editor.Text;
             editor.Text = "";
             
            
             if(client._Client.Connected){
-                AddMensagem(new Label() { Text = msg }, Mensagem.Remetente.Servidor);
+                ShowMensagem(msg, TipoMensagem.TEXTO, Remetente.SERVIDOR);
                 client.SendMessage(msg);
             }
             else
             {
-                AddMensagem(new Label() { Text = msg }, Mensagem.Remetente.Servidor);
+                ShowMensagem(msg, TipoMensagem.TEXTO, Remetente.SERVIDOR);
                 StartConnection(msg);
                 if (client._Client.Connected)
                 {
-                    AddMensagem(new Label() { Text = "Conectado com sucesso" }, Mensagem.Remetente.Cliente);
+                    ShowMensagem("Conectado com sucesso", TipoMensagem.TEXTO, Remetente.SERVIDOR);
+                    
                 }
-                _enviarImagem();
+
+                //_enviarImagem();
                 //_enviarVideo();
+
             }
         }
 
-        private void _enviarImagem()
+        private void _enviarImagem(string imgPath)
         {
-            string imgPath = System.IO.Path.Combine(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, "ylderlan.jpg");
+
+            //string imgPath = System.IO.Path.Combine(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, "ylderlan.jpg");
+
 
             /*using (StreamReader sr = new StreamReader(imgPath))
             {
@@ -118,6 +142,7 @@ namespace MobileChatP2P
             byte[] allData;
             allData = System.IO.File.ReadAllBytes(imgPath);
             client.SendImage(allData);
+            ShowMensagem(imgPath, TipoMensagem.IMAGEM, Remetente.SERVIDOR);
         }
 
         private void _enviarVideo()

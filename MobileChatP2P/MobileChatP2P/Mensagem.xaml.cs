@@ -15,19 +15,22 @@ namespace MobileChatP2P
         IMAGEM = 1,
         VIDEO = 2,
     }
+
+    public enum Remetente
+    {
+        CLIENTE,
+        SERVIDOR
+    }
+
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class Mensagem : ContentView
     {
-        public enum Remetente
-        {
-            Cliente,
-            Servidor
-        }
-        public Mensagem(View conteudo, Remetente remetente, int status)
+        
+        private Mensagem(View conteudo, Remetente remetente, int status)
         {
             InitializeComponent();
             frame.Content = conteudo;
-            if(remetente == Remetente.Cliente)
+            if(remetente == Remetente.CLIENTE)
             {
                 frame.Margin = new Thickness(2, 2, 35, 2);
                 if (status == 0)
@@ -39,6 +42,27 @@ namespace MobileChatP2P
                     frame.BackgroundColor = Color.PaleGreen;
                 }
             }
+        }
+
+        public static Mensagem CriarMensagem(string menssagem, TipoMensagem tipo, Remetente remetente, int status)
+        {
+            
+            
+            View conteudo = null;
+            switch (tipo)
+            {   
+                case TipoMensagem.TEXTO:
+                    conteudo = new Label() { Text = menssagem };
+                    break;
+                case TipoMensagem.IMAGEM:
+                    conteudo = new Image() { Source = menssagem, HeightRequest=150, Aspect=Aspect.AspectFill};
+                    break;
+                case TipoMensagem.VIDEO:
+                    break;
+                default:
+                    break;
+            }
+            return new Mensagem(conteudo, remetente, status);
         }
 
     }
