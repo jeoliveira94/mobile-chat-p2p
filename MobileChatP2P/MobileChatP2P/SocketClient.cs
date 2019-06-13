@@ -4,10 +4,9 @@ using System.Text;
 
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
+
 using System.IO;
-using System.Drawing;
-using Android.Graphics;
+
 using System.Linq;
 
 namespace MobileChatP2P

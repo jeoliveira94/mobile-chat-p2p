@@ -4,9 +4,8 @@ using System.Windows.Input;
 using System.Net;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using Android.Graphics;
 using System.IO;
-using Java.IO;
+using Xamarin.Forms.PlatformConfiguration;
 
 namespace MobileChatP2P
 {
@@ -38,23 +37,21 @@ namespace MobileChatP2P
 
             client = new SocketClient();
             meuIp = client.myIpAddress.ToString();
-
-            
             //RunServer();
 
         }
 
-        public void AddMensagem(View conteudo, Mensagem.Remetente remetente, int status = 1)
+        public void ShowMensagem(string mensagem, TipoMensagem tipo, Remetente remetente, int status = 1)
         {
-            var mensagem = new Mensagem(conteudo, remetente, status);
-            stack.Children.Add(mensagem);
-            scrollView.ScrollToAsync(mensagem, ScrollToPosition.End, false);
+            var msg = Mensagem.CriarMensagem(mensagem, tipo, remetente, status);
+            stack.Children.Add(msg);
+            scrollView.ScrollToAsync(msg, ScrollToPosition.End, false);
         }
 
-        public void MensagemRecebida(string msg)
+        public void MensagemRecebida(string msg, TipoMensagem tipo)
         {
             Device.BeginInvokeOnMainThread(() => {
-                AddMensagem(new Label() { Text = msg }, Mensagem.Remetente.Cliente);
+                ShowMensagem(msg, tipo, Remetente.CLIENTE);
             });
         }
 
@@ -66,7 +63,7 @@ namespace MobileChatP2P
             }catch(Exception e)
             {
                 Device.BeginInvokeOnMainThread(() => {
-                    AddMensagem(new Label() { Text = "IP invalido, seu burro." }, Mensagem.Remetente.Cliente, 0);
+                    ShowMensagem("IP invalido, seu burro.", TipoMensagem.TEXTO, Remetente.CLIENTE, 0);
                 });
             }
         }
@@ -76,36 +73,37 @@ namespace MobileChatP2P
             server.Listen(MensagemRecebida);            
             client.StopClient();
             Device.BeginInvokeOnMainThread(() => {
-                AddMensagem(new Label() { Text = "Desconectado" }, Mensagem.Remetente.Cliente, 0);
+                ShowMensagem("Desconectado", TipoMensagem.TEXTO, Remetente.CLIENTE, 0);
             });
         }
 
         private void _enviarMensagem()
         {
-            if (editor.Text == String.Empty) return;
+            if (editor.Text == string.Empty) return;
             string msg = editor.Text;
             editor.Text = "";
             
            
             if(client._Client.Connected){
-                AddMensagem(new Label() { Text = msg }, Mensagem.Remetente.Servidor);
+                ShowMensagem(msg, TipoMensagem.TEXTO, Remetente.SERVIDOR);
                 client.SendMessage(msg);
             }
             else
             {
-                AddMensagem(new Label() { Text = msg }, Mensagem.Remetente.Servidor);
+                ShowMensagem(msg, TipoMensagem.TEXTO, Remetente.SERVIDOR);
                 StartConnection(msg);
                 if (client._Client.Connected)
                 {
-                    AddMensagem(new Label() { Text = "Conectado com sucesso" }, Mensagem.Remetente.Cliente);
+                    ShowMensagem("Conectado com sucesso", TipoMensagem.TEXTO, Remetente.SERVIDOR);
+                    
                 }
-                _enviarImagem();
+                
             }
         }
 
         private void _enviarImagem()
         {
-            string imgPath = System.IO.Path.Combine(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, "display.png");
+            string imgPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonPictures), "display.png");
 
             using (StreamReader sr = new StreamReader(imgPath))
             {
