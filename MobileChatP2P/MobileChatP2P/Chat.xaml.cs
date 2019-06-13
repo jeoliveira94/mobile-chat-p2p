@@ -14,7 +14,8 @@ namespace MobileChatP2P
     public partial class Chat : ContentPage
     {
         public ICommand enviarMensagem { get; }
-        public ICommand anexar_item { get; }
+        public ICommand anexar_imagem { get; }
+        public ICommand anexar_video { get; }
         public string meuIp { get; set; } = "teste";
         private SocketClient client;
         private SocketServer server;
@@ -27,7 +28,7 @@ namespace MobileChatP2P
 
 
             enviarMensagem = new Command(_enviarMensagem);
-            anexar_item = new Command(async () => {
+            anexar_imagem = new Command(async () => {
                 if (!CrossMedia.Current.IsPickPhotoSupported)
                 {
                     DisplayAlert("Photos Not Supported", ":( Permission not granted to photos.", "OK");
@@ -42,14 +43,35 @@ namespace MobileChatP2P
                 if (file == null)
                     return;
                 _enviarImagem(file.Path);
-                for (int i = 0; i < 5; i++)
-                {
-                    Console.WriteLine(file.Path);
-                }
+
+                file.Dispose();
                 
             });
+
+            anexar_video = new Command(async () => {
+                if (!CrossMedia.Current.IsPickVideoSupported)
+                {
+                    DisplayAlert("Videos Not Supported", ":( Permission not granted to photos.", "OK");
+                    return;
+                }
+                /*var file = await Plugin.Media.CrossMedia.Current.PickPhotoAsync(new Plugin.Media.Abstractions.PickMediaOptions
+                {
+                    PhotoSize = Plugin.Media.Abstractions.PhotoSize.Medium,
+
+                });*/
+
+                var file = await Plugin.Media.CrossMedia.Current.PickVideoAsync();
+
+                if (file == null)
+                    return;
+                
+                _enviarVideo(file.Path);
+                file.Dispose();
+            });
+
             button.Command = enviarMensagem;
-            btn_Anexar.Command = anexar_item;
+            btn_Anexar_Imagem.Command = anexar_imagem;
+            btn_Anexar_Video.Command = anexar_video;
 
             server = new SocketServer();
             Task.Run(() => {                
@@ -145,9 +167,9 @@ namespace MobileChatP2P
             ShowMensagem(imgPath, TipoMensagem.IMAGEM, Remetente.SERVIDOR);
         }
 
-        private void _enviarVideo()
+        private void _enviarVideo(string videoPath)
         {
-            string videoPath = System.IO.Path.Combine(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, "batata.mp4");
+            //string videoPath = System.IO.Path.Combine(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, "batata.mp4");
 
             /*using (StreamReader sr = new StreamReader(imgPath))
             {
@@ -159,6 +181,7 @@ namespace MobileChatP2P
             byte[] allData;
             allData = System.IO.File.ReadAllBytes(videoPath);
             client.SendVideo(allData);
+            ShowMensagem("Video Enviado "+videoPath, TipoMensagem.TEXTO, Remetente.SERVIDOR);
         }
 
 

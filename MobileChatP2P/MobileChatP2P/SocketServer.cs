@@ -3,7 +3,7 @@ using System.Text;
 
 using System.Net;
 using System.Net.Sockets;
-
+using Plugin.Media;
 
 namespace MobileChatP2P
 {
@@ -79,14 +79,14 @@ namespace MobileChatP2P
                     {
                         for(int i = 0; i < dataReceived; i++)
                         {
-                            buffer_total[size_recebido + i] = buffer[i];
+                            buffer_total[size_recebido + i -10] = buffer[i];
                         }
                         size_recebido += dataReceived;                        
                     }
 
                     if (size_recebido >= size_esperado)
                     {
-                        byte[] dados_bytes = new byte[size_recebido];
+                        byte[] dados_bytes = new byte[size_recebido-10];
 
                         for (int i = 0; i < dados_bytes.Length; i++)
                         {
@@ -107,11 +107,7 @@ namespace MobileChatP2P
                             
                             string fileName = System.IO.Path.Combine(dirPath, "img_"+DateTime.Now.ToString("yyyyMMdd_hhmmss")+ ".png");
                    
-
-                            for (int i = 0; i < 5; i++)
-                            {
-                                Console.WriteLine(fileName);
-                            }
+                            
 
 
                             System.IO.File.WriteAllBytes(fileName, dados_bytes);
@@ -131,7 +127,8 @@ namespace MobileChatP2P
 
                             System.IO.File.WriteAllBytes(fileName, dados_bytes);
 
-        
+                           
+
                             data = "Recebendo um Video";
                             //callback(data, TipoMensagem.TEXTO);
                             callback(fileName, TipoMensagem.VIDEO);
@@ -157,5 +154,7 @@ namespace MobileChatP2P
                 System.Console.WriteLine(e.ToString());
             }
         }
+
+
     }
 }

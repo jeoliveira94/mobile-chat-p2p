@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:forms="clr-namespace:Plugin.MediaManager.Forms;assembly=Plugin.MediaManager.Forms"
              x:Class="MobileChatP2P.Chat"
              
              Title="{Binding meuIp}">
@@ -14,7 +15,8 @@
         </ResourceDictionary>
     </ContentPage.Resources>
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Anexar" Command="anexar_item" x:Name="btn_Anexar"/>
+        <ToolbarItem Text="Imagem" x:Name="btn_Anexar_Imagem"/>
+        <ToolbarItem Text="Video" x:Name="btn_Anexar_Video"/>
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <StackLayout VerticalOptions="FillAndExpand">
