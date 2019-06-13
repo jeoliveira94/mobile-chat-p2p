@@ -100,22 +100,43 @@ namespace MobileChatP2P
                     AddMensagem(new Label() { Text = "Conectado com sucesso" }, Mensagem.Remetente.Cliente);
                 }
                 _enviarImagem();
+                //_enviarVideo();
             }
         }
 
         private void _enviarImagem()
         {
-            string imgPath = System.IO.Path.Combine(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, "display.png");
+            string imgPath = System.IO.Path.Combine(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, "ylderlan.jpg");
 
-            using (StreamReader sr = new StreamReader(imgPath))
+            /*using (StreamReader sr = new StreamReader(imgPath))
             {
                 BinaryReader binreader = new BinaryReader(sr.BaseStream);
                 var allData = ReadAllBytes(binreader);
                 //Bitmap bitmap = BitmapFactory.DecodeByteArray(allData, 0, allData.Length);
                 client.SendImage(allData);
-            }           
-
+            }     */
+            byte[] allData;
+            allData = System.IO.File.ReadAllBytes(imgPath);
+            client.SendImage(allData);
         }
+
+        private void _enviarVideo()
+        {
+            string videoPath = System.IO.Path.Combine(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, "batata.mp4");
+
+            /*using (StreamReader sr = new StreamReader(imgPath))
+            {
+                BinaryReader binreader = new BinaryReader(sr.BaseStream);
+                var allData = ReadAllBytes(binreader);
+                //Bitmap bitmap = BitmapFactory.DecodeByteArray(allData, 0, allData.Length);
+                client.SendImage(allData);
+            }     */
+            byte[] allData;
+            allData = System.IO.File.ReadAllBytes(videoPath);
+            client.SendVideo(allData);
+        }
+
+
 
         public static byte[] ReadAllBytes(BinaryReader reader)
         {

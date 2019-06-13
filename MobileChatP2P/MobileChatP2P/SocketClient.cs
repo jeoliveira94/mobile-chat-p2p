@@ -93,6 +93,36 @@ namespace MobileChatP2P
                 _Stream.Write(mensagem_total, 0, mensagem_total.Length);
             }
         }
+
+        public void SendVideo(byte[] buffer)
+        {
+            if (_Client.Connected)
+            {
+                byte code = (int)TipoMensagem.VIDEO;
+                byte[] mensagem_total = new byte[buffer.Length + 10];
+                mensagem_total[0] = code;
+                var result = GetDigits3(mensagem_total.Length);
+                int[] digits = result.ToArray();
+                for (int i = 0; i < 9; i++)
+                {
+                    int curdig = (digits.Length - 1) - i;
+                    int curmsg = 9 - i;
+
+                    if (curmsg == 0) break;
+                    if (curdig >= 0)
+                    {
+                        mensagem_total[curmsg] = (byte)digits[curdig];
+                    }
+                    else
+                    {
+                        mensagem_total[curmsg] = 0;
+                    }
+                }
+                buffer.CopyTo(mensagem_total, 10);
+                // Write Message to the Stream:
+                _Stream.Write(mensagem_total, 0, mensagem_total.Length);
+            }
+        }
         /*private void SendCode(TipoMensagem tipo)
         {
             ASCIIEncoding _Asc = new ASCIIEncoding();

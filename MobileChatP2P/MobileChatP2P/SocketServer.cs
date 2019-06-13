@@ -105,8 +105,13 @@ namespace MobileChatP2P
                         }
                         else if (tipo_atual == TipoMensagem.IMAGEM)
                         {
-
-                            string fileName = System.IO.Path.Combine(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, "kelson.png");
+                            string dirPath = Android.OS.Environment.ExternalStorageDirectory.AbsolutePath + "/" + "MobileChatData";
+                            if (!System.IO.Directory.Exists(dirPath))
+                            {
+                                System.IO.Directory.CreateDirectory(dirPath);
+                            }
+                            
+                            string fileName = System.IO.Path.Combine(dirPath, "img_"+DateTime.Now.ToString("yyyyMMdd_hhmmss")+ ".png");
 
                             System.IO.File.WriteAllBytes(fileName, dados_bytes);
 
@@ -114,9 +119,15 @@ namespace MobileChatP2P
                         }
                         else if (tipo_atual == TipoMensagem.VIDEO)
                         {
-                            data = "Recebendo um Video";
-                            callback(data);
-                            //tipo_atual = TipoMensagem.CODE;
+                            string dirPath = Android.OS.Environment.ExternalStorageDirectory.AbsolutePath + "/" + "MobileChatData";
+                            if (!System.IO.Directory.Exists(dirPath))
+                            {
+                                System.IO.Directory.CreateDirectory(dirPath);
+                            }
+
+                            string fileName = System.IO.Path.Combine(dirPath, "vid_" + DateTime.Now.ToString("yyyyMMdd_hhmmss") + ".mp4");
+
+                            System.IO.File.WriteAllBytes(fileName, dados_bytes);
                         }
 
                         buffer_total = new byte[100000000];
